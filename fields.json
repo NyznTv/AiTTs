@@ -1,0 +1,15 @@
+{
+    "dono": {
+      "type": "text",
+      "label": "Donation Text",
+      "value": " spendet "
+    },
+    "delay": {
+      "type": "number",
+      "label": "The delay before the text disappears in ms",
+      "value": 3000,
+      "min": 0,
+      "max": 10000,
+      "step": 500
+    }
+  }
