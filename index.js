@@ -1,7 +1,7 @@
 const TTsText = document.querySelector("#TTS-Text");
 const TTsDonator = document.querySelector("#TTS-Donator");
 
-const queqe = []
+queqe = []
 
 const searchStrings = [["hugo","letshugo","letshugotv","ügo"],["basti","bastighg","bastian"]]
 const searchIcons = [" :",":"," =","="," >",">"]
@@ -9,43 +9,39 @@ const searchIcons = [" :",":"," =","="," >",">"]
 const voiceIds = {"bot":"21m00Tcm4TlvDq8ikWAM","hugo":"CYw3kZ02Hs0563khs1Fj","basti":"D38z5RcWu1voky8WS1ja"}
 
 let dono;
+window.addEventListener('onWidgetLoad', async function (obj) {
+    apiKey = obj.detail.fieldData.apiKey;
+    dono = obj.detail.fieldData.dono;
+    rDelay = obj.detail.fieldData.delay;
+    alrRunning = false
+});
 
-export function widgetLoad() {
-  apiKey = obj.detail.fieldData.apiKey;
-  dono = obj.detail.fieldData.dono;
-  rDelay = obj.detail.fieldData.delay;
-  alrRunning = false
-}
+window.addEventListener('onEventReceived', async function (obj) {
+    if(!obj.detail.event) {
+      return;
+    }
+    if(typeof obj.detail.event.itemId !== "undefined") {
+        obj.detail.listener = "redemption-latest"
+    }
+    const listener = obj.detail.listener.split("-")[0];
+    const event = obj.detail.event;
 
-export async function eventReceived() {
-  if(!obj.detail.event) {
-    return;
-  }
-  if(typeof obj.detail.event.itemId !== "undefined") {
-      obj.detail.listener = "redemption-latest"
-  }
-  const listener = obj.detail.listener.split("-")[0];
-  const event = obj.detail.event;
-
-  if(listener === 'tip') {
-      if(event.amount >= 3) {
-        if(event.message !== undefined) {
-          queqe.push(JSON.parse('{"amount":'+event.amount+',"message":"'+event.message+'","name":"'+event.name+'"}'))
-          while(queqe.length > 0 && alrRunning === false) {
-            alrRunning = true
-            TTsDonator.textContent = queqe[0].name +" "+ dono +" "+ event.amount +"€"
-            TTsText.textContent = queqe[0].message
-            await playAudio(queqe[0].message)
-            queqe.splice(0,1)
+    if(listener === 'tip') {
+        if(event.amount >= 3) {
+          if(event.message !== undefined) {
+            queqe.push(JSON.parse('{"amount":'+event.amount+',"message":"'+event.message+'","name":"'+event.name+'"}'))
+            while(queqe.length > 0 && alrRunning === false) {
+              alrRunning = true
+              TTsDonator.textContent = queqe[0].name +" "+ dono +" "+ event.amount +"€"
+              TTsText.textContent = queqe[0].message
+              await playAudio(queqe[0].message)
+              queqe.splice(0,1)
+            }
+            alrRunning = false
           }
-          alrRunning = false
         }
-      }
-  }
-}
-
-window.addEventListener('onEventReceived', async function (obj) {})
-window.addEventListener('onWidgetLoad', async function (obj) {})
+    }
+});
 
 async function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
